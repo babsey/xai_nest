@@ -1,4 +1,4 @@
-# Xircuits Component Library Template
+# Xircuits Component Library for NEST Simulator.
 
 This section should have a short description on what is does.
 
@@ -11,7 +11,7 @@ A project may have prerequisites such as models that needs to be downloaded or n
 To use this component library, ensure you have Xircuits installed, then simply run:
 
 ```
-xircuits install https://github.com/your-organization/your-repository
+xircuits install https://github.com/babsey/xai_nest
 ```
 
 Alternatively you may manually copy the directory / clone or submodule the repository to your working Xircuits project directory then install the packages using:
