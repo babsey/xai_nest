@@ -11,4 +11,4 @@ keywords = ["xircuits", "nest"]
 # Xircuits-specific configurations
 [tool.xircuits]
 requirements_path = "requirements.txt"
-default_example_path = "nest.xircuits"
+default_example_path = "SingleNeuronSpikes.xircuits"
