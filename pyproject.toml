@@ -5,7 +5,7 @@ description = "Xircuits component library for NEST Simulator."
 authors = [{ name = "Sebastian Spreizer", email = "spreizer@web.de" }]
 license = "Apache-2.0"
 readme = "readme.md"
-repository = "https://github.com/babsey/xai_nest"
+repository = "https://github.com/babsey/xai-nest"
 keywords = ["xircuits", "nest"]
 
 # Xircuits-specific configurations
