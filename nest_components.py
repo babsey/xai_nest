@@ -1,9 +1,17 @@
-from xai_components.base import InArg, OutArg, InCompArg, Component, BaseComponent, xai_component, SubGraphExecutor, \
-    dynalist
+from xai_components.base import (
+    InArg,
+    OutArg,
+    InCompArg,
+    Component,
+    # BaseComponent,
+    xai_component,
+    # SubGraphExecutor,
+    # dynalist,
+)
 import nest
 
 
-@xai_component(color='orange')
+@xai_component(color="orange")
 class NESTConnect(Component):
     """Connect `pre` nodes to `post` nodes.
 
@@ -33,15 +41,15 @@ class NESTConnect(Component):
     It is possible to connect NumPy arrays of node IDs one-to-one by passing
     the arrays as `pre` and `post`, specifying `'one_to_one'` for `conn_spec`.
     In that case, the arrays may contain non-unique IDs. You may also specify
-    weight, delay, and receptor type for each connection as NumPy arrays in the 
+    weight, delay, and receptor type for each connection as NumPy arrays in the
     `syn_spec` dictionary.
-    This feature is currently not available when MPI is used; trying to connect 
+    This feature is currently not available when MPI is used; trying to connect
     arrays with more than one MPI process will raise an error.
 
     If pre and post have spatial positions, a `mask` can be specified as a
     dictionary. The mask define which nodes are considered as potential targets
-    for each source node. Connections with spatial nodes can also use 
-    `nest.spatial_distributions` as parameters, for instance for the 
+    for each source node. Connections with spatial nodes can also use
+    `nest.spatial_distributions` as parameters, for instance for the
     probability `p`.
 
     **Connectivity specification (conn_spec)**
@@ -83,7 +91,7 @@ class NESTConnect(Component):
     If `synapse_model` is not specified the default model `static_synapse`
     will be used.
 
-    Distributed parameters can be defined through NEST's different 
+    Distributed parameters can be defined through NEST's different
     parametertypes. NEST has various random parameters, spatial parameters and
     distributions (only accessible for nodes with spatial positions), logical
     expressions and mathematical expressions, which can be used to define node
@@ -103,17 +111,18 @@ class NESTConnect(Component):
     syn_spec: InArg[dict]
     return_synapsecollection: InArg[bool]
     value: OutArg[dict]
-    
+
     def execute(self, ctx) -> None:
         self.value.value = nest.Connect(
-            self.pre.value, 
-            self.post.value, 
+            self.pre.value,
+            self.post.value,
             self.conn_spec.value,
             self.syn_spec.value,
-            self.return_synapsecollection.value
+            self.return_synapsecollection.value,
         )
 
-@xai_component(color='orange')
+
+@xai_component(color="orange")
 class NESTCreate(Component):
     """Create one or more nodes.
 
@@ -124,12 +133,12 @@ class NESTCreate(Component):
     Note
     ----
     If `Create()` is called with two arguments and the second argument (`n`) is
-    a dictionary, this dictionary will be intepreted as `params` for backward 
+    a dictionary, this dictionary will be intepreted as `params` for backward
     compatibility.
 
-    During network construction, create all nodes representing model neurons 
-    first, then all nodes representing devices (generators, recorders, or 
-    detectors), or all devices first and then all neurons. Otherwise, network 
+    During network construction, create all nodes representing model neurons
+    first, then all nodes representing devices (generators, recorders, or
+    detectors), or all devices first and then all neurons. Otherwise, network
     connection can be slow, especially in parallel simulations of networks
     with many devices.
 
@@ -180,73 +189,70 @@ class NESTCreate(Component):
         self.n.value = 1
         self.params.value = None
         self.positions.value = None
-    
+
     def execute(self, ctx) -> None:
         self.value.value = nest.Create(
-            self.model.value, 
-            self.n.value, 
-            self.params.value,
-            self.positions.value
+            self.model.value, self.n.value, self.params.value, self.positions.value
         )
 
-@xai_component(color='orange')
+
+@xai_component(color="orange")
 class NESTGetStatus(Component):
     """Get parameters from nodes or connections.
 
-        Parameters
-        ----------
-        nodes_or_conns: NodeCollection or SynapseCollection
-            `NodeCollection` of nodes or `SynapseCollection` of connections.
-        keys : str or list, optional
-            Parameters to get from the nodes. It must be one of the following:
+    Parameters
+    ----------
+    nodes_or_conns: NodeCollection or SynapseCollection
+        `NodeCollection` of nodes or `SynapseCollection` of connections.
+    keys : str or list, optional
+        Parameters to get from the nodes. It must be one of the following:
 
-            - A single string.
-            - A list of strings.
-            - One or more strings, followed by a string or list of strings.
-              This is for hierarchical addressing.
-        output : str, ['pandas','json'], optional
-             If the returned data should be in a Pandas DataFrame or in a
-             JSON string format.
+        - A single string.
+        - A list of strings.
+        - One or more strings, followed by a string or list of strings.
+          This is for hierarchical addressing.
+    output : str, ['pandas','json'], optional
+         If the returned data should be in a Pandas DataFrame or in a
+         JSON string format.
 
-        Returns
-        -------
-        int or float:
-            If there is a single node in the `NodeCollection`, and a single
-            parameter in params.
-        array_like:
-            If there are multiple nodes in the `NodeCollection`, and a single
-            parameter in params.
-        dict:
-            If there are multiple parameters in params. Or, if no parameters
-            are specified, a dictionary containing aggregated parameter-values
-            for all nodes is returned.
-        DataFrame:
-            Pandas Data frame if output should be in pandas format.
+    Returns
+    -------
+    int or float:
+        If there is a single node in the `NodeCollection`, and a single
+        parameter in params.
+    array_like:
+        If there are multiple nodes in the `NodeCollection`, and a single
+        parameter in params.
+    dict:
+        If there are multiple parameters in params. Or, if no parameters are
+        specified, a dictionary containing aggregated parameter-values
+        for all nodes is returned.
+    DataFrame:
+        Pandas Data frame if output should be in pandas format.
 
-        Raises
-        ------
-        TypeError
-            If the input params are of the wrong form.
-        KeyError
-            If the specified parameter does not exist for the nodes.
+    Raises
+    ------
+    TypeError
+        If the input params are of the wrong form.
+    KeyError
+        If the specified parameter does not exist for the nodes.
     """
 
-    nodes_or_conns: InCompArg[any] 
+    nodes_or_conns: InCompArg[any]
     keys: InArg[list]
     output: InArg[str]
     value: OutArg[any]
-    
+
     def execute(self, ctx) -> None:
-        # try: 
+        # try:
         self.value.value = nest.GetStatus(
-            self.nodes_or_conns.value, 
-            self.keys.value, 
-            self.output.value
+            self.nodes_or_conns.value, self.keys.value, self.output.value
         )
         # except:
         #     self.value.value = self.nodes_or_conns.value.get(keys, output)
 
-@xai_component(color='orange')
+
+@xai_component(color="orange")
 class NESTResetKernel(Component):
     """Reset the simulation kernel.
 
@@ -268,16 +274,16 @@ class NESTResetKernel(Component):
     unloaded.
 
     """
-    
+
     def execute(self, ctx) -> None:
         nest.ResetKernel()
 
-@xai_component(color='orange')
+
+@xai_component(color="orange")
 class NESTSetKernelStatus(Component):
     """Set parameters for the simulation kernel.
 
-    See the documentation of `sec_kernel_attributes` for a valid list of
-    params.
+    See the documentation of `sec_kernel_attributes` for a valid list of params.
 
     Parameters
     ----------
@@ -295,21 +301,24 @@ class NESTSetKernelStatus(Component):
     local_num_threads: InArg[int]
     resolution: InArg[float]
     rng_seed: InArg[int]
-    
+
     def __init__(self):
         super().__init__()
         self.local_num_threads.value = 1
         self.resolution.value = 0.1
         self.rng_seed.value = 1
 
-    def execute(self, ctx) -> None:        
-        nest.SetKernelStatus({
-            'local_num_threads': self.local_num_threads.value,
-            'resolution': self.resolution.value,
-            'rng_seed': self.rng_seed.value
-        })
+    def execute(self, ctx) -> None:
+        nest.SetKernelStatus(
+            {
+                "local_num_threads": self.local_num_threads.value,
+                "resolution": self.resolution.value,
+                "rng_seed": self.rng_seed.value,
+            }
+        )
 
-@xai_component(color='orange')
+
+@xai_component(color="orange")
 class NESTSimulate(Component):
     """Simulate the network for `t` milliseconds.
 
@@ -327,6 +336,6 @@ class NESTSimulate(Component):
     """
 
     t: InCompArg[int]
-    
-    def execute(self, ctx) -> None:        
+
+    def execute(self, ctx) -> None:
         nest.Simulate(self.t.value)
